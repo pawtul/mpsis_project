@@ -59,17 +59,22 @@ class BruteForceSolver(BaseSolver):
 
 class IterativeSolver(BaseSolver):
     def solve(self):
-        node_numbers = range(self.matrix_size)
+        node_numbers = set(range(self.matrix_size))
         best_combination = {'nodes': set(), 'metric': Infinity()}
-        while len(best_combination) < self.number_to_remove:
+
+        while len(best_combination['nodes']) < self.number_to_remove:
+            current_nodes = list(best_combination['nodes'])
+            best_metric = best_combination['metric']
+            best_node = None
+
             for node in node_numbers:
                 new_metric = self.check_metric_with_excluded_nodes(
-                        list(best_combination['nodes']) + [node])
+                        list(current_nodes) + [node])
+                if new_metric <= best_metric:
+                    best_metric = new_metric
+                    best_node = node
+            best_combination['nodes'].add(best_node)
+            best_combination['metric'] = best_metric
 
-                if new_metric <= best_combination['metric']:
-                    best_combination['nodes'].add(node)
-
-                best_combination['metric'] = min(
-                        best_combination['metric'], new_metric)
         return best_combination
 
