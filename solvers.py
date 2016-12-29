@@ -78,3 +78,20 @@ class IterativeSolver(BaseSolver):
 
         return best_combination
 
+
+class ReverseIterativeSolver(BaseSolver):
+    def get_most_friendly_node(self):
+        """
+        Get node with the greatest number of neighbours
+        """
+        pass
+
+    def get_least_friendly_node(self):
+        """
+        Get node with the smallest number of neighbours
+        """
+        pass
+
+    def solve(self):
+        pass
+
