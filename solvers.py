@@ -80,18 +80,31 @@ class IterativeSolver(BaseSolver):
 
 
 class ReverseIterativeSolver(BaseSolver):
-    def get_most_friendly_node(self):
-        """
-        Get node with the greatest number of neighbours
-        """
-        pass
-
-    def get_least_friendly_node(self):
-        """
-        Get node with the smallest number of neighbours
-        """
-        pass
+    def get_node_with_extrene_num_of_nei(self, func=min):
+        return func(range(self.matrix_size),
+                key=lambda n: self.matrix[n, :].sum() + self.matrix[:, n].sum())
 
     def solve(self):
-        pass
+        lsn = self.get_node_with_extrene_num_of_nei()
+        nodes = set(range(self.matrix_size))
+        nodes.remove(lsn)
+
+        best_combination = {
+                'nodes': {lsn},
+                'metric': self.check_metric_with_excluded_nodes([lsn])}
+        while len(best_combination['nodes']) < self.number_to_remove:
+            metric_candidate = Infinity()
+            best_nodes = list(best_combination['nodes'])
+            best_node = None
+            for node in nodes:
+                current_metric = self.check_metric_with_excluded_nodes(
+                        best_nodes + [node])
+                if current_metric < metric_candidate:
+                    best_node = node
+                    metric_candidate = current_metric
+            best_combination['nodes'].add(best_node)
+            best_combination['metric'] = metric_candidate
+            nodes.remove(best_node)
+        return best_combination
+
 
