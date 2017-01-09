@@ -1,3 +1,4 @@
+from functools import partial
 from itertools import combinations
 
 import numpy as np
@@ -75,17 +76,20 @@ class IterativeSolver(BaseSolver):
                     best_node = node
             best_combination['nodes'].add(best_node)
             best_combination['metric'] = best_metric
+            node_numbers.remove(best_node)
 
         return best_combination
 
 
-class ReverseIterativeSolver(BaseSolver):
-    def get_node_with_extrene_num_of_nei(self, func=min):
-        return func(range(self.matrix_size),
+class ReverseIterativeSolver(IterativeSolver):
+    def get_node_with_extrene_num_of_nei(self, function=min):
+        return function(range(self.matrix_size),
                 key=lambda n: self.matrix[n, :].sum() + self.matrix[:, n].sum())
 
+    get_first_node = get_node_with_extrene_num_of_nei
+
     def solve(self):
-        lsn = self.get_node_with_extrene_num_of_nei()
+        lsn = self.get_first_node()
         nodes = set(range(self.matrix_size))
         nodes.remove(lsn)
 
@@ -106,5 +110,4 @@ class ReverseIterativeSolver(BaseSolver):
             best_combination['metric'] = metric_candidate
             nodes.remove(best_node)
         return best_combination
-
 
