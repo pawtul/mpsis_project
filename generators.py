@@ -9,3 +9,13 @@ def generate_random_matrix(n):
             mat[i, k] = mat[k, i] = randint(0, 1)
     return mat
 
+
+def generate_files_with_matrix(n, filename):
+    mat = generate_random_matrix(n)
+    cplex_mat = mat + np.eye(n)
+    with open(filename+'.mod') as file:
+        file.write("mat = " + str(cplex_mat) + ";")
+
+    with open(filename+'.py') as file:
+        file.write("mat = " + str(mat))
+
