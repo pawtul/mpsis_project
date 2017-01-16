@@ -19,7 +19,7 @@ def generate_files_with_matrix(n, filename):
         if not sum(mat[i]):
             return generate_files_with_matrix(n, filename)
 
-    with open(filename+'.mod', "w") as file:
+    with open(filename+'.dat', "w") as file:
         file.write("mat = " + str(cplex_mat) + ";")
 
     with open(filename+'.py', "w") as file:
