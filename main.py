@@ -1,40 +1,48 @@
 import argparse
+import json
+import re
 
 import numpy as np
 
 from utils import check_and_prepare_matrix
-
 from generators import generate_random_matrix
 from solvers import BruteForceSolver, IterativeSolver, ReverseIterativeSolver
 
-from importlib import import_module
-
 parser = argparse.ArgumentParser()
+parser.add_argument('-s', type=int, default=0)
 parser.add_argument('-n', type=int, default=5, help='number of data files', dest='n')
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
     n = args.n
+    s = args.s
 
-    solutions_iter = []
-    solutions_reviter = []
+    # solutions_iter = []
+    # solutions_reviter = []
+    solutions = []
 
-    for i in range(n):
-        mat = np.load("data/cutMatrix{}.npy".format(i))
-        cut_matrix_mod = import_module("data.cutMatrix{}".format(i))
-        d = cut_matrix_mod.d
-        solutions_iter.append(IterativeSolver(mat, d).solve())
-        solutions_reviter.append(ReverseIterativeSolver(mat, d).solve())
+    for i in range(s, n):
+        mat = np.load("data/cutMatrix{}.npy".format(i)).astype(int)
+        d = json.load(open("data/cutMatrix{}.json".format(i)))["d"]
+        # d = int(re.findall(r"d=(\d+)",
+                # open("data/cutMatrix{}.py".format(i)).read())[0])
+        # solutions_iter.append(IterativeSolver(mat, d).solve())
+        # solutions_reviter.append(ReverseIterativeSolver(mat, d).solve())
+        _is = IterativeSolver(mat, d).solve()
+        ris = ReverseIterativeSolver(mat, d).solve()
+        solutions.append(min([_is, ris], key=lambda x:x['metric']))
+
 
     # solutions_final = [min([si, ri], key=lambda x: x['metric'])
             # for si, sr in zip(solutions_iter, solutions_reviter)]
 
     # for s in solutions_final:
         # print(s)
-    for i in range(n):
-        print(solutions_iter[i])
-        print(solutions_reviter[i])
+    for i in solutions:
+        # print(solutions_iter[i])
+        # print(solutions_reviter[i])
+        print(i)
     # matrix = generate_random_matrix(n)
     # n = cutMatrix.d
     # matrix = check_and_prepare_matrix(np.matrix(cutMatrix.mat))

@@ -1,5 +1,6 @@
 import argparse
 
+import json
 from random import randint
 
 import numpy as np
@@ -27,9 +28,10 @@ def generate_files_with_matrix(n, filename):
         file.write("d={};\n".format(d))
         file.write("mat = " + str(cplex_mat).replace(".", "") + ";")
 
-    with open(filename+'.py', "w") as file:
-        file.write("n={}\n".format(n))
-        file.write("d={}\n".format(d))
+    with open(filename+'.json', "w") as file:
+        json.dump({"d":d, "n":n}, file)
+        # file.write("n={}\n".format(n))
+        # file.write("d={}\n".format(d))
         np.save(filename, mat)
 
 parser = argparse.ArgumentParser("Generates file of matrices")
