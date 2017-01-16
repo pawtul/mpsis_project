@@ -4,6 +4,8 @@ from random import randint
 
 import numpy as np
 
+np.set_printoptions(threshold=np.nan)
+
 def generate_random_matrix(n):
     mat = np.zeros((n, n))
     for i in range(n-1):
@@ -14,16 +16,21 @@ def generate_random_matrix(n):
 
 def generate_files_with_matrix(n, filename):
     mat = generate_random_matrix(n)
-    cplex_mat = mat + np.eye(n)
     for i in range(n):
         if not sum(mat[i]):
             return generate_files_with_matrix(n, filename)
+    cplex_mat = mat + np.eye(n)
+    d = randint(1, n-1)
 
     with open(filename+'.dat', "w") as file:
-        file.write("mat = " + str(cplex_mat) + ";")
+        file.write("n={};\n".format(n))
+        file.write("d={};\n".format(d))
+        file.write("mat = " + str(cplex_mat).replace(".", "") + ";")
 
     with open(filename+'.py', "w") as file:
-        file.write("mat = " + str(mat))
+        file.write("n={}\n".format(n))
+        file.write("d={}\n".format(d))
+        np.save(filename, mat)
 
 parser = argparse.ArgumentParser("Generates file of matrices")
 parser.add_argument("-n", dest='n', type=int)
