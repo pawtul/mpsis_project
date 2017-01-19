@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime
 import json
 import re
 
@@ -11,6 +12,7 @@ from solvers import BruteForceSolver, IterativeSolver, ReverseIterativeSolver
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', type=int, default=0)
 parser.add_argument('-n', type=int, default=5, help='number of data files', dest='n')
+parser.add_argument("-o", default=None, dest='o')
 
 
 if __name__ == "__main__":
@@ -21,16 +23,20 @@ if __name__ == "__main__":
     # solutions_iter = []
     # solutions_reviter = []
     solutions = []
+    times = []
 
-    for i in range(s, n):
+    for i in range(s, n+1):
         mat = np.load("data/cutMatrix{}.npy".format(i)).astype(int)
         d = json.load(open("data/cutMatrix{}.json".format(i)))["d"]
         # d = int(re.findall(r"d=(\d+)",
                 # open("data/cutMatrix{}.py".format(i)).read())[0])
         # solutions_iter.append(IterativeSolver(mat, d).solve())
         # solutions_reviter.append(ReverseIterativeSolver(mat, d).solve())
+        start_time = datetime.now()
         _is = IterativeSolver(mat, d).solve()
         ris = ReverseIterativeSolver(mat, d).solve()
+        end_time = datetime.now()
+        times.append((end_time - start_time).total_seconds())
         solutions.append(min([_is, ris], key=lambda x:x['metric']))
 
 
@@ -43,6 +49,14 @@ if __name__ == "__main__":
         # print(solutions_iter[i])
         # print(solutions_reviter[i])
         print(i)
+
+    if args.o:
+        with open(args.o + ".res", "w") as file:
+            file.writelines(['{}, {}\n'.format(i, j['metric']) for i, j in enumerate(solutions, start=args.s)])
+
+        with open(args.o + ".time", "w") as file:
+            file.writelines(['{}, {}\n'.format(i, j) for i, j in enumerate(times, start=args.s)])
+
     # matrix = generate_random_matrix(n)
     # n = cutMatrix.d
     # matrix = check_and_prepare_matrix(np.matrix(cutMatrix.mat))
